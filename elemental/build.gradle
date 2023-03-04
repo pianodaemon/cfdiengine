@@ -1,0 +1,6 @@
+description = 'elemental'
+
+dependencies {
+
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jackson_version}"
+}
