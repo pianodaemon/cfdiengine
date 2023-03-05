@@ -78,17 +78,6 @@ public abstract class Processor {
 
     protected abstract String fetchPassword(final Map<String, String> issuerAttribs) throws EngineError;
 
-    @AllArgsConstructor
-    @Getter
-    public class Stages<T extends IDecodeStep, W extends IXmlStep> {
-
-        final @NonNull
-        T decodeStep;
-
-        final @NonNull
-        W xmlStep;
-    }
-
     public interface IStorage {
 
         public void upload(final String cType,

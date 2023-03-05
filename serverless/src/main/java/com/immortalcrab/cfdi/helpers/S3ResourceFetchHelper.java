@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-class S3ResourceFetchHelper {
+public class S3ResourceFetchHelper {
 
     static final String ISSUER_IDENTIFIER_ATTRIB = "rfc";
     static final String PREFIX_SSL = "prefix_ssl";

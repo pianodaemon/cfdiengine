@@ -10,7 +10,7 @@ import com.immortalcrab.cfdi.errors.ErrorCodes;
 
 import java.util.Optional;
 
-class S3ClientHelper {
+public class S3ClientHelper {
 
     public static AmazonS3 setupWithEnv() throws EngineError {
 
