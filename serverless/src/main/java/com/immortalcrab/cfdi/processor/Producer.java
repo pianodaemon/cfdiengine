@@ -112,8 +112,7 @@ public class Producer extends Processor {
                 BufferedInputStream certificate, BufferedInputStream signerKey, final String passwd) throws EngineError {
 
             var ic = new FacturaXml((FacturaRequestDTO) req, certificate, signerKey, passwd);
-            Map<String, Object> pacReq = Map.of("payload", ic.toString());
-            return stamper.impress(pacReq);
+            return stamper.impress(ic.toString());
         }
     }
 }

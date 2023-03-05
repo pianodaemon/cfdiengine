@@ -8,7 +8,7 @@ import java.util.Map;
 public class PacSapienStamp implements IStamp<PacReply> {
 
     @Override
-    public PacReply impress(Map<String, Object> pacReq) throws EngineError {
+    public PacReply impress(final String payload) throws EngineError {
 
         throw new UnsupportedOperationException("Not supported yet.");
     }

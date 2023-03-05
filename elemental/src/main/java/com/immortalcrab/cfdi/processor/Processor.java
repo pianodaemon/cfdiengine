@@ -117,7 +117,7 @@ public abstract class Processor {
     @FunctionalInterface
     public interface IStamp<T extends PacReply> {
 
-        public T impress(final Map<String, Object> pacReq) throws EngineError;
+        public T impress(final String payload) throws EngineError;
     }
 
     @FunctionalInterface
