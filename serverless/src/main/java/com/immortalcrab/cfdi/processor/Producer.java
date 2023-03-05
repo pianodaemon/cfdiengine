@@ -3,6 +3,7 @@ package com.immortalcrab.cfdi.processor;
 import com.immortalcrab.cfdi.dtos.FacturaRequestDTO;
 import com.immortalcrab.cfdi.errors.EngineError;
 import com.immortalcrab.cfdi.errors.ErrorCodes;
+import com.immortalcrab.cfdi.helpers.S3ClientHelper;
 import com.immortalcrab.cfdi.helpers.S3ReqURLParser;
 import com.immortalcrab.cfdi.helpers.S3ResourceFetchHelper;
 import com.immortalcrab.cfdi.xml.FacturaXml;
@@ -23,6 +24,23 @@ public class Producer extends Processor {
     private static final String XML_MIME_TYPE = "text/xml";
     private static final String XML_FILE_EXTENSION = ".xml";
     ResourceDescriptor rdesc;
+
+    public static Producer obtainSteadyPipeline() throws EngineError {
+
+        S3BucketStorage s3Resources = new S3BucketStorage(S3ClientHelper.setupWithEnv(), System.getenv("BUCKET_RESOURCES"));
+        S3BucketStorage s3DataLake = new S3BucketStorage(S3ClientHelper.setupWithEnv(), System.getenv("BUCKET_DATA_LAKE"));
+
+        ResourceDescriptor rdescriptor = ResourceDescriptor.fetchProfile(s3Resources, System.getenv("PROFILE_RESOURCES"));
+        s3Resources.setPathPrefixes(rdescriptor.getPrefixes().turnIntoMap());
+
+        ResourceDescriptor.Pac pac = rdescriptor.getPacSettings(System.getenv("PAC")).orElseThrow(() -> new EngineError("The pac requested is not registered", ErrorCodes.PIPELINE_NOT_SPINNED_UP));
+
+        return new Producer(
+                rdescriptor,
+                PacSapienStamp.setup(pac.getCarrier(), pac.getLogin(), pac.getPasswd()),
+                s3DataLake,
+                s3Resources);
+    }
 
     Producer(ResourceDescriptor rdesc, final IStamp stamper, final IStorage storage, final IStorage resources) throws EngineError {
 
