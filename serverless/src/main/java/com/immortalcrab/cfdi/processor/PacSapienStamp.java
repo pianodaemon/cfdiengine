@@ -2,10 +2,20 @@ package com.immortalcrab.cfdi.processor;
 
 import com.immortalcrab.cfdi.errors.EngineError;
 import com.immortalcrab.cfdi.processor.Processor.IStamp;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j2;
 
-import java.util.Map;
-
+@Log4j2
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PacSapienStamp implements IStamp<PacReply> {
+
+    private @NonNull
+    final String login;
+
+    private @NonNull
+    final String passwd;
 
     @Override
     public PacReply impress(final String payload) throws EngineError {
@@ -13,9 +23,9 @@ public class PacSapienStamp implements IStamp<PacReply> {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public static PacSapienStamp setup(final String name, final String user, final String passwd) {
+    public static PacSapienStamp setup(final String carrier, final String login, final String passwd) {
 
-        // It is still pending to add code here
-        return new PacSapienStamp();
+        log.info("Setting up pac: " + carrier);
+        return new PacSapienStamp(login, passwd);
     }
 }
