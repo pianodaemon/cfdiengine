@@ -2,6 +2,7 @@ package com.immortalcrab.cfdi.xml;
 
 import com.immortalcrab.cfdi.dtos.FacturaRequestDTO;
 import com.immortalcrab.cfdi.errors.EngineError;
+import com.immortalcrab.cfdi.errors.ErrorCodes;
 
 import mx.gob.sat.cfd._4.Comprobante;
 import mx.gob.sat.cfd._4.ObjectFactory;
@@ -12,7 +13,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.DatatypeConfigurationException;
-import java.io.StringWriter;
 import java.util.List;
 import java.io.BufferedInputStream;
 import java.io.StringWriter;
@@ -24,20 +24,20 @@ import lombok.extern.log4j.Log4j2;
 public class FacturaXml {
 
     private final @NonNull
-    FacturaRequestDTO _req;
+    FacturaRequestDTO req;
 
-    private final StringWriter _sw;
+    private final StringWriter sw;
 
     public FacturaXml(FacturaRequestDTO req,
             BufferedInputStream certificate, BufferedInputStream signerKey, final String passwd) throws EngineError {
 
-        _req = req;
-        _sw = shape();
+        this.req = req;
+        sw = shape();
     }
 
     @Override
     public String toString() {
-        return _sw.toString();
+        return sw.toString();
     }
 
     private StringWriter shape() throws EngineError {
@@ -48,40 +48,40 @@ public class FacturaXml {
             ObjectFactory cfdiFactory = new ObjectFactory();
             Comprobante cfdi = cfdiFactory.createComprobante();
             cfdi.setVersion(FacturaRequestDTO.CFDI_VER);
-            cfdi.setSerie(_req.getComprobanteAttributes().getSerie());
-            cfdi.setFolio(_req.getComprobanteAttributes().getFolio());
-            cfdi.setFecha(DatatypeFactory.newInstance().newXMLGregorianCalendar(_req.getComprobanteAttributes().getFecha()));
-            cfdi.setFormaPago(_req.getComprobanteAttributes().getFormaPago());
-            cfdi.setNoCertificado(_req.getComprobanteAttributes().getNoCertificado());
-            cfdi.setSubTotal(_req.getComprobanteAttributes().getSubTotal());
-            cfdi.setDescuento(_req.getComprobanteAttributes().getDescuento());
-            cfdi.setMoneda(CMoneda.fromValue(_req.getComprobanteAttributes().getMoneda()));
-            cfdi.setTipoCambio(_req.getComprobanteAttributes().getTipoCambio());
-            cfdi.setTotal(_req.getComprobanteAttributes().getTotal());
+            cfdi.setSerie(req.getComprobanteAttributes().getSerie());
+            cfdi.setFolio(req.getComprobanteAttributes().getFolio());
+            cfdi.setFecha(DatatypeFactory.newInstance().newXMLGregorianCalendar(req.getComprobanteAttributes().getFecha()));
+            cfdi.setFormaPago(req.getComprobanteAttributes().getFormaPago());
+            cfdi.setNoCertificado(req.getComprobanteAttributes().getNoCertificado());
+            cfdi.setSubTotal(req.getComprobanteAttributes().getSubTotal());
+            cfdi.setDescuento(req.getComprobanteAttributes().getDescuento());
+            cfdi.setMoneda(CMoneda.fromValue(req.getComprobanteAttributes().getMoneda()));
+            cfdi.setTipoCambio(req.getComprobanteAttributes().getTipoCambio());
+            cfdi.setTotal(req.getComprobanteAttributes().getTotal());
             cfdi.setTipoDeComprobante(CTipoDeComprobante.fromValue(FacturaRequestDTO.TIPO_COMPROBANTE));
-            cfdi.setExportacion(_req.getComprobanteAttributes().getExportacion());
-            cfdi.setMetodoPago(CMetodoPago.fromValue(_req.getComprobanteAttributes().getMetodoPago()));
-            cfdi.setLugarExpedicion(_req.getComprobanteAttributes().getLugarExpedicion());
+            cfdi.setExportacion(req.getComprobanteAttributes().getExportacion());
+            cfdi.setMetodoPago(CMetodoPago.fromValue(req.getComprobanteAttributes().getMetodoPago()));
+            cfdi.setLugarExpedicion(req.getComprobanteAttributes().getLugarExpedicion());
 
             Comprobante.Emisor emisor = cfdiFactory.createComprobanteEmisor();
-            emisor.setRfc(_req.getEmisorAttributes().getRfc());
-            emisor.setNombre(_req.getEmisorAttributes().getNombre());
-            emisor.setRegimenFiscal(_req.getEmisorAttributes().getRegimenFiscal());
+            emisor.setRfc(req.getEmisorAttributes().getRfc());
+            emisor.setNombre(req.getEmisorAttributes().getNombre());
+            emisor.setRegimenFiscal(req.getEmisorAttributes().getRegimenFiscal());
             cfdi.setEmisor(emisor);
 
             Comprobante.Receptor receptor = cfdiFactory.createComprobanteReceptor();
-            receptor.setRfc(_req.getReceptorAttributes().getRfc());
-            receptor.setNombre(_req.getReceptorAttributes().getNombre());
-            receptor.setDomicilioFiscalReceptor(_req.getReceptorAttributes().getDomicilioFiscalReceptor());
-            receptor.setResidenciaFiscal(CPais.fromValue(_req.getReceptorAttributes().getResidenciaFiscal()));
-            receptor.setRegimenFiscalReceptor(_req.getReceptorAttributes().getRegimenFiscalReceptor());
-            receptor.setUsoCFDI(CUsoCFDI.fromValue(_req.getReceptorAttributes().getUsoCfdi()));
+            receptor.setRfc(req.getReceptorAttributes().getRfc());
+            receptor.setNombre(req.getReceptorAttributes().getNombre());
+            receptor.setDomicilioFiscalReceptor(req.getReceptorAttributes().getDomicilioFiscalReceptor());
+            receptor.setResidenciaFiscal(CPais.fromValue(req.getReceptorAttributes().getResidenciaFiscal()));
+            receptor.setRegimenFiscalReceptor(req.getReceptorAttributes().getRegimenFiscalReceptor());
+            receptor.setUsoCFDI(CUsoCFDI.fromValue(req.getReceptorAttributes().getUsoCfdi()));
             cfdi.setReceptor(receptor);
 
             // Conceptos
             Comprobante.Conceptos conceptos = cfdiFactory.createComprobanteConceptos();
 
-            for (FacturaRequestDTO.PseudoConcepto psc : _req.getPseudoConceptos()) {
+            for (FacturaRequestDTO.PseudoConcepto psc : req.getPseudoConceptos()) {
 
                 var concepto = cfdiFactory.createComprobanteConceptosConcepto();
 
@@ -141,11 +141,11 @@ public class FacturaXml {
             cfdi.setConceptos(conceptos);
 
             var impuestos = cfdiFactory.createComprobanteImpuestos();
-            impuestos.setTotalImpuestosRetenidos(_req.getImpuestosAttributes().getTotalImpuestosRetenidos());
-            impuestos.setTotalImpuestosTrasladados(_req.getImpuestosAttributes().getTotalImpuestosTrasladados());
+            impuestos.setTotalImpuestosRetenidos(req.getImpuestosAttributes().getTotalImpuestosRetenidos());
+            impuestos.setTotalImpuestosTrasladados(req.getImpuestosAttributes().getTotalImpuestosTrasladados());
 
             var impuestosRetenciones = cfdiFactory.createComprobanteImpuestosRetenciones();
-            for (FacturaRequestDTO.ImpuestosRetencionAttributes impRet : _req.getImpuestosRetenciones()) {
+            for (FacturaRequestDTO.ImpuestosRetencionAttributes impRet : req.getImpuestosRetenciones()) {
 
                 var impRetencion = cfdiFactory.createComprobanteImpuestosRetencionesRetencion();
 
@@ -154,12 +154,12 @@ public class FacturaXml {
 
                 impuestosRetenciones.getRetencion().add(impRetencion);
             }
-            if (!_req.getImpuestosRetenciones().isEmpty()) {
+            if (!req.getImpuestosRetenciones().isEmpty()) {
                 impuestos.setRetenciones(impuestosRetenciones);
             }
 
             var impuestosTraslados = cfdiFactory.createComprobanteImpuestosTraslados();
-            for (FacturaRequestDTO.ImpuestosTrasladoAttributes impTras : _req.getImpuestosTraslados()) {
+            for (FacturaRequestDTO.ImpuestosTrasladoAttributes impTras : req.getImpuestosTraslados()) {
 
                 var impTraslado = cfdiFactory.createComprobanteImpuestosTrasladosTraslado();
 
@@ -171,7 +171,7 @@ public class FacturaXml {
 
                 impuestosTraslados.getTraslado().add(impTraslado);
             }
-            if (!_req.getImpuestosTraslados().isEmpty()) {
+            if (!req.getImpuestosTraslados().isEmpty()) {
                 impuestos.setTraslados(impuestosTraslados);
             }
             cfdi.setImpuestos(impuestos);
@@ -188,7 +188,8 @@ public class FacturaXml {
             marshaller.marshal(cfdi, sw);
 
         } catch (JAXBException | DatatypeConfigurationException ex) {
-            throw new EngineError("", ex);
+            throw new EngineError("Impossible to turn the request into the xml",
+                    ex, ErrorCodes.FORMAT_BUILDER_ISSUE);
         }
 
         return sw;
