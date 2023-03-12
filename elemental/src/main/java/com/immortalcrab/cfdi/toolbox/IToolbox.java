@@ -1,9 +1,12 @@
 package com.immortalcrab.cfdi.toolbox;
 
 import com.immortalcrab.cfdi.errors.EngineError;
+import com.immortalcrab.cfdi.utils.PemSigner;
+
 import java.io.BufferedReader;
 import javax.xml.transform.Source;
 import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.codec.binary.Base64;
 
 public interface IToolbox {
@@ -16,5 +19,7 @@ public interface IToolbox {
         return OriginalStrExtractor.read(br, srcXslt);
     }
 
-    public String signOriginal(BufferedReader brPrivKeyPem, String original) throws EngineError;
+    public default String signOriginal(BufferedReader brPrivKeyPem, String original) throws EngineError {
+        return PemSigner.sign(brPrivKeyPem, original);
+    }
 }
