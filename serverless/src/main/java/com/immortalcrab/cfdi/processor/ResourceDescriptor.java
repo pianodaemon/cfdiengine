@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -35,50 +36,30 @@ class ResourceDescriptor extends JsonToMapHelper {
 
         try {
 
-            {
-                List<Map<String, Object>> pacs = LegoAssembler.obtainObjFromKey(this.getDs(), "pac");
+            List<Map<String, Object>> alternatives;
+            alternatives = LegoAssembler.obtainObjFromKey(this.getDs(), "pac");
 
-                pacs.stream().map(i -> {
+            alternatives.stream().map(i -> new Pac(
+                    LegoAssembler.obtainObjFromKey(i, Pac.kCARRIER),
+                    LegoAssembler.obtainObjFromKey(i, Pac.kLOGIN),
+                    LegoAssembler.obtainObjFromKey(i, Pac.kPASSWD)
+            )).forEachOrdered(p -> this.pacs.put(p.getCarrier(), p));
 
-                    Pac p = new Pac(
-                            LegoAssembler.obtainObjFromKey(i, "carrier"),
-                            LegoAssembler.obtainObjFromKey(i, "login"),
-                            LegoAssembler.obtainObjFromKey(i, "passwd")
-                    );
+            List<Map<String, Object>> subs = LegoAssembler.obtainObjFromKey(this.getDs(), "issuers");
 
-                    return p;
+            subs.stream().map(i -> new Issuer(
+                    LegoAssembler.obtainObjFromKey(i, Issuer.kRFC),
+                    LegoAssembler.obtainObjFromKey(i, Issuer.kCERT),
+                    LegoAssembler.obtainObjFromKey(i, Issuer.kPRIVATEKEY),
+                    LegoAssembler.obtainObjFromKey(i, Issuer.kPASSWD)
+            )).forEachOrdered(o -> issuers.put(o.getRfc(), o));
 
-                }).forEachOrdered(wr -> {
-                    this.pacs.put(wr.getCarrier(), wr);
-                });
-            }
+            Map<String, Object> mres = LegoAssembler.obtainMapFromKey(this.getDs(), "res");
 
-            {
-                List<Map<String, Object>> subs = LegoAssembler.obtainObjFromKey(this.getDs(), "issuers");
+            prefixes = new Prefixes(
+                    LegoAssembler.obtainObjFromKey(mres, "prefix_ssl"),
+                    LegoAssembler.obtainObjFromKey(mres, "prefix_xslt"));
 
-                subs.stream().map(i -> {
-
-                    Issuer s = new Issuer(
-                            LegoAssembler.obtainObjFromKey(i, "rfc"),
-                            LegoAssembler.obtainObjFromKey(i, "cer"),
-                            LegoAssembler.obtainObjFromKey(i, "key"),
-                            LegoAssembler.obtainObjFromKey(i, "passwd")
-                    );
-
-                    return s;
-
-                }).forEachOrdered(o -> {
-                    issuers.put(o.getRfc(), o);
-                });
-            }
-
-            {
-                Map<String, Object> mres = LegoAssembler.obtainMapFromKey(this.getDs(), "res");
-
-                prefixes = new Prefixes(
-                        LegoAssembler.obtainObjFromKey(mres, "prefix_ssl"),
-                        LegoAssembler.obtainObjFromKey(mres, "prefix_xslt"));
-            }
         } catch (NoSuchElementException ex) {
             log.error("One or more of the mandatory elements of resource descriptor is missing");
             throw new EngineError("mandatory element in resource descriptor is missing", ex, ErrorCodes.UNKNOWN_ISSUE);
@@ -127,23 +108,35 @@ class ResourceDescriptor extends JsonToMapHelper {
     @Getter
     public static class Pac {
 
-        private final String carrier;
-        private final String login;
-        private final String passwd;
+        private static String kCARRIER = "carrier";
+        private static String kLOGIN = "login";
+        private static String kPASSWD = "passwd";
+
+        private final @NonNull
+        String carrier;
+        private final @NonNull
+        String login;
+        private final @NonNull
+        String passwd;
     }
 
     @AllArgsConstructor
     @Getter
     public static class Issuer {
 
+        private static String kRFC = "rfc";
+        private static String kPRIVATEKEY = "pk";
+        private static String kCERT = "cert";
+        private static String kPASSWD = "passwd";
+
         private final String rfc;
-        private final String cer;
+        private final String cert;
         private final String key;
         private final String passwd;
 
         public Map<String, String> turnIntoMap() {
 
-            return Map.of("rfc", rfc, "key", key, "cert", cer, "passwd", passwd);
+            return Map.of(kRFC, rfc, kPRIVATEKEY, key, kCERT, cert, kPASSWD, passwd);
         }
     }
 }
