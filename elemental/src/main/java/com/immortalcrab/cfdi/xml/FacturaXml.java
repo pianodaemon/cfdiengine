@@ -32,7 +32,7 @@ public class FacturaXml {
             BufferedInputStream certificate, BufferedInputStream signerKey, final String passwd) throws EngineError {
 
         this.req = req;
-        sw = shape();
+        this.sw = shape();
     }
 
     @Override
@@ -42,7 +42,7 @@ public class FacturaXml {
 
     private StringWriter shape() throws EngineError {
 
-        StringWriter sw = new StringWriter();
+        StringWriter writer = new StringWriter();
 
         try {
             ObjectFactory cfdiFactory = new ObjectFactory();
@@ -185,13 +185,13 @@ public class FacturaXml {
             marshaller.setProperty("jaxb.schemaLocation", schemaLocation);
             marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new CfdiNamespaceMapper());
             marshaller.setProperty("jaxb.formatted.output", true);
-            marshaller.marshal(cfdi, sw);
+            marshaller.marshal(cfdi, writer);
 
         } catch (JAXBException | DatatypeConfigurationException ex) {
             throw new EngineError("Impossible to turn the request into the xml",
                     ex, ErrorCodes.FORMAT_BUILDER_ISSUE);
         }
 
-        return sw;
+        return writer;
     }
 }
