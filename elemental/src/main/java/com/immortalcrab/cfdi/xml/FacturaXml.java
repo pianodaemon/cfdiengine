@@ -29,7 +29,7 @@ public class FacturaXml {
     private final StringWriter sw;
 
     public FacturaXml(FacturaRequestDTO req,
-            BufferedInputStream certificate, BufferedInputStream signerKey, final String passwd) throws EngineError {
+            BufferedInputStream certificate, BufferedInputStream signerKey, final String certificateNo) throws EngineError {
 
         this.req = req;
         this.sw = shape();
