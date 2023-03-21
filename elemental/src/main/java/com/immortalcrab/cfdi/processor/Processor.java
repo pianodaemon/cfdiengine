@@ -130,6 +130,6 @@ public abstract class Processor {
     public interface IXmlStep<T extends PacReply, R extends ClientRequest> {
 
         public T render(R cfdiReq, IStamp<? extends PacReply> stamper,
-                BufferedInputStream certificate, BufferedInputStream signerKey, final String passwd) throws EngineError;
+                BufferedInputStream certificate, BufferedInputStream signerKey, final String certificateNo) throws EngineError;
     }
 }
