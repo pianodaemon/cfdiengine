@@ -109,9 +109,9 @@ public class Producer extends Processor {
     private static class Wiring {
 
         public static <R extends ClientRequest> PacReply fac(R req, IStamp<PacReply> stamper,
-                BufferedInputStream certificate, BufferedInputStream signerKey, final String passwd) throws EngineError {
+                BufferedInputStream certificate, BufferedInputStream signerKey, final String certificateNo) throws EngineError {
 
-            var ic = new FacturaXml((FacturaRequestDTO) req, certificate, signerKey, passwd);
+            var ic = new FacturaXml((FacturaRequestDTO) req, certificate, signerKey, certificateNo);
             return stamper.impress(ic.toString());
         }
     }
